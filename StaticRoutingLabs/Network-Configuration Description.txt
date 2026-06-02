@@ -1,0 +1,129 @@
+
+LAB GUIDE: STATIC AND DEFAULT ROUTING (EVE-NG ENVIRONMENT)
+================================================================================
+
+1. ROUTER IP ADDRESSING PROCEDURE
+--------------------------------------------------------------------------------
+
+--- ROUTER R4 ---
+enable
+configure terminal
+interface eth0/0
+ ip address 172.16.1.1 255.255.255.0
+ no shutdown
+ exit
+interface se1/0
+ ip address 172.16.4.1 255.255.255.0
+ no shutdown
+ exit
+interface se1/1
+ ip address 172.16.5.1 255.255.255.0
+ no shutdown
+ end
+
+--- ROUTER R5 ---
+enable
+configure terminal
+interface eth0/0
+ ip address 172.16.3.1 255.255.255.0
+ no shutdown
+ exit
+interface se1/1
+ ip address 172.16.5.2 255.255.255.0
+ no shutdown
+ end
+
+--- ROUTER R6 ---
+enable
+configure terminal
+interface eth0/0
+ ip address 172.16.2.1 255.255.255.0
+ no shutdown
+ exit
+interface se1/0
+ ip address 172.16.4.2 255.255.255.0
+ no shutdown
+ end
+
+
+2. STATIC AND DEFAULT ROUTING PROCEDURE
+--------------------------------------------------------------------------------
+
+--- ROUTER R4 ---
+configure terminal
+ip route 172.16.2.0 255.255.255.0 se1/0
+ip route 172.16.3.0 255.255.255.0 se1/1
+end
+
+--- ROUTER R5 ---
+configure terminal
+ip route 172.16.1.0 255.255.255.0 se1/1
+ip route 0.0.0.0 0.0.0.0 se1/1
+end
+
+--- ROUTER R6 ---
+configure terminal
+ip route 172.16.1.0 255.255.255.0 se1/0
+ip route 0.0.0.0 0.0.0.0 se1/0
+end
+
+
+3. LINUX HOST NETPLAN CONFIGURATIONS (PERSISTENT REBOOT)
+--------------------------------------------------------------------------------
+Note: Replace the default configuration file in /etc/netplan/ (e.g., 
+01-netcfg.yaml or 50-cloud-init.yaml) with the respective block below, 
+then execute 'sudo netplan apply'.
+
+--- LINUX SERVER 1 (Connected to R4 eth0/0) ---
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      addresses:
+        - 172.16.1.4/24
+      routes:
+        - to: default
+          via: 172.16.1.1
+
+--- LINUX SERVER 2 (Connected to R6 eth0/0) ---
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      addresses:
+        - 172.16.2.4/24
+      routes:
+        - to: default
+          via: 172.16.2.1
+
+--- LINUX SERVER 3 (Connected to R5 eth0/0) ---
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      addresses:
+        - 172.16.3.4/24
+      routes:
+        - to: default
+          via: 172.16.3.1
+
+
+4. VERIFICATION AND DIAGNOSTICS PROCEDURES
+--------------------------------------------------------------------------------
+
+Step 5.1: On Each Router, run the following to verify the routing table updates:
+show ip route static
+show ip route
+
+Step 5.2: On Each Linux Server, execute Netplan application and route checking:
+sudo netplan apply
+ip addr show eth0
+ip route show
+
+Step 5.3: Test End-to-End Connectivity from Linux Server 1 (172.16.1.4):
+ping 172.16.2.4 -c 4
+ping 172.16.3.4 -c 4
+================================================================================
