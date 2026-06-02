@@ -13,10 +13,10 @@ This repository is organized by technology and use-case. Each topology directory
 
 | Category / Technology | Description | Status |
 | :--- | :--- | :--- |
-| **Core Networking** | OSPF, BGP, MPLS, and advanced routing/switching labs. | 🟢 Ready |
+| **Core Networking** | OSPF, BGP, MPLS, and advanced routing/switching labs. |🟡 In Progress  |
 | **Telecom & Core Infrastructure** | DNS (BIND), PCRF, and mobile core architecture scenarios. | 🟡 In Progress |
-| **Network Automation** | Labs integrated with Prometheus, Grafana, and automated health-checks. | 🟢 Ready |
-| **Security & Edge** | Firewall deployments, NAT, and secure edge configurations. | 🟢 Ready |
+| **Network Automation** | Labs integrated with Prometheus, Grafana, and automated health-checks. | 🟡 In Progress  |
+| **Security & Edge** | Firewall deployments, NAT, and secure edge configurations. | 🟡 In Progress  |
 
 ---
 
